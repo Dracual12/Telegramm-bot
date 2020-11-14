@@ -1,0 +1,91 @@
+import telebot
+from telebot import types
+import re
+import heapq
+import nltk
+from nltk.corpus import stopwords
+import requests
+from bs4 import BeautifulSoup
+
+nltk.download('stopwords')
+
+
+def get_html(url):
+    r = requests.get(url)
+    r.encoding = 'utf8'
+    return r.text
+
+
+def get_head(html):
+    soup = BeautifulSoup(html, 'lxml')
+    return soup
+
+
+link = 'https://tabiturient.ru/vuzu/mifi/'
+site_name = get_html(link)
+site_data = get_head(site_name)
+head = site_data.find('div').find_all(style="text-align:justify;", class_='font2')
+heads = []
+for i in head:
+    heads.append(i.string)
+heads = [e for e in heads if e is not None]
+
+text = ''
+for e in heads:
+    text += e
+sentences = re.split(r' *[\.\?!][\'"\)\]]* *', text)
+clean_text = text.lower()
+word_tokenize = clean_text.split()
+
+stop_words = set(stopwords.words('russian'))
+
+word2count = {}
+for word in word_tokenize:
+    if word not in stop_words:
+        if word not in word2count.keys():
+            word2count[word] = 1
+        else:
+            word2count[word] += 1
+sent2score = {}
+for sentence in sentences:
+    for word in sentence.split():
+        if word in word2count.keys():
+            if 28 > len(sentence.split(' ')) > 9:
+                if sentence not in sent2score.keys():
+                    sent2score[sentence] = word2count[word]
+                else:
+                    sent2score[sentence] += word2count[word]
+
+for key in word2count.keys():
+    word2count[key] = word2count[key] / max(word2count.values())
+
+best_three_sentences = heapq.nlargest(5, sent2score, key=sent2score.get)
+a = ''
+for e in best_three_sentences:
+    a += ' ' + e
+
+bot = telebot.TeleBot('1449367202:AAEwKojyXQ_hgkPwUKLSWgnqdkuNtJj4zRE')
+
+
+@bot.message_handler(content_types=['text'])
+def get_text_messages(message):
+    if message.text == "/start":
+        bot.send_message(message.from_user.id, "Привет, о каком ВУЗе вы хотите получить отзыв?")
+        bot.send_message(message.from_user.id, text='Выбор ВУЗа', reply_markup=keyboard)
+    else:
+        bot.send_message(message.from_user.id, "Я тебя не понимаю. Напиши /start.")
+
+
+keyboard = types.InlineKeyboardMarkup()
+key_mephi = types.InlineKeyboardButton(text='МИФИ', callback_data='VUZ')
+keyboard.add(key_mephi)
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_worker(call):
+    if call.data == "VUZ":
+        msg = a
+        bot.send_message(call.message.chat.id, msg)
+
+
+bot.polling(none_stop=True, interval=0)
