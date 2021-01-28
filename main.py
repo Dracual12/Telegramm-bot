@@ -209,18 +209,11 @@ def callback_worker(call):
         link += '/about'
         site_name = get_html(link)
         site_data = get_head(site_name)
-        about = []
-        head = site_data.find_all('ul', class_='font2')
-        for e in head:
-            about.append(e.text)
-        about = [e for e in about if e is not None]
-        about_text = 'Структура ВУЗа:\n' + ''.join(about[0:-1])
-        bot.send_message(call.message.chat.id, about_text)
-
-        head = site_data.find_all('b', attrs={'style': 'text-transform:uppercase; color:#8D8D8D;'})
+        head = site_data.find_all('div', class_='p40 pm40')
         for e in head:
             about2.append(e.text)
         about2 = [e for e in about2 if e is not None]
+        bot.send_message(call.message.chat.id, about2[0].replace('\n\n\n\n\n', '\n'))
 
     if call.data == 'otziv':
         bot.send_message(call.message.chat.id, 'Вы хотите получить общий отзыв или по конкретной теме?',
@@ -243,7 +236,6 @@ def callback_worker(call):
                 dod.append(e.text)
             dod = [e for e in dod if e is not None]
             dod2 = []
-            print(dod)
             for e in dod:
                 i = e.replace('\n\n\n\n\n\n\n\n\n\nПодробнее\n\n\n\n\n', '')
                 i = i.replace('\n\n\n\n\n\n\n', '\n')
@@ -267,16 +259,16 @@ def callback_worker(call):
         obsh = [e for e in obsh if e is not None]
         bot.send_message(call.message.chat.id, obsh[0].replace('\n\n\n\n\n\n', '\n').replace('\n\n\n\n', '\n'))
 
-        if call.data == 'prohodnoi':
-            link += '/prohodnoi'
-            ball = []
-            site_name = get_html(link)
-            site_data = get_head(site_name)
-            head = site_data.find_all('div', id_="rezspec")
-            for e in head:
-                ball.append(e.text)
-            ball = [e for e in ball if e is not None]
-            print(ball)
+    if call.data == 'prohodnoi':
+        link += '/prohodnoi'
+        ball = []
+        site_name = get_html(link)
+        site_data = get_head(site_name)
+        head = site_data.find_all('div', class_='mobpadd20-3')
+        for e in head:
+            ball.append(e.text)
+        ball = [e for e in ball if e is not None]
+        bot.send_message(call.message.chat.id, ''.join(ball))
 
 
 
