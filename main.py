@@ -6,8 +6,70 @@ from bs4 import BeautifulSoup
 from random import choice
 import requests
 
-heads = []
-
+dict = {'мирэа': 'https://tabiturient.ru/vuzu/mirea',
+        'мгту': 'https://tabiturient.ru/vuzu/mgtu',
+        'ниу вшэ': 'https://tabiturient.ru/vuzu/hse',
+        'маи': 'https://tabiturient.ru/vuzu/mai/',
+        'фу': 'https://tabiturient.ru/vuzu/fu',
+        'мгму': 'https://tabiturient.ru/vuzu/mgmu',
+        'рут': 'https://tabiturient.ru/vuzu/miit',
+        'рниму': 'https://tabiturient.ru/vuzu/rnimu',
+        'московский политех': 'https://tabiturient.ru/vuzu/mospolytech',
+        'ргау мсха': 'https://tabiturient.ru/vuzu/timacad',
+        'мпгу': 'https://tabiturient.ru/vuzu/mpgu',
+        'мэи': 'https://tabiturient.ru/vuzu/mpei',
+        'мгпу': 'https://tabiturient.ru/vuzu/mgpu',
+        'ргунг': 'https://tabiturient.ru/vuzu/gubkin',
+        'рхту': 'https://tabiturient.ru/vuzu/muctr',
+        'ниу мгсу': 'https://tabiturient.ru/vuzu/mgsu',
+        'ргу': 'https://tabiturient.ru/vuzu/kosygin',
+        'мгюа': 'https://tabiturient.ru/vuzu/mgua',
+        'мфти': 'https://tabiturient.ru/vuzu/mipt',
+        'мифи': 'https://tabiturient.ru/vuzu/mifi',
+        'мглу': 'https://tabiturient.ru/vuzu/mglu',
+        'мгоу': 'https://tabiturient.ru/vuzu/mgou',
+        'мтуси': 'https://tabiturient.ru/vuzu/mtusi',
+        'рудн': 'https://tabiturient.ru/vuzu/rudn',
+        'рггу': 'https://tabiturient.ru/vuzu/rsuh',
+        'ранхигс': 'https://tabiturient.ru/vuzu/ranepa',
+        'ниту мисис': 'https://tabiturient.ru/vuzu/misis',
+        'миэт': 'https://tabiturient.ru/vuzu/miet',
+        'мгупп': 'https://tabiturient.ru/vuzu/mgupp',
+        'ргуфусмит': 'https://tabiturient.ru/vuzu/rgufksmit',
+        'рэу': 'https://tabiturient.ru/vuzu/reu',
+        'мгту станкин': 'https://tabiturient.ru/vuzu/stankin',
+        'мгмсу': 'https://tabiturient.ru/vuzu/mgmsu',
+        'ргсу': 'https://tabiturient.ru/vuzu/rgsu/',
+        'мгппу': 'https://tabiturient.ru/vuzu/mgppu',
+        'гуу': 'https://tabiturient.ru/vuzu/guu',
+        'мади': 'https://tabiturient.ru/vuzu/madi',
+        'миигаик': 'https://tabiturient.ru/vuzu/miigaik',
+        'мгту га': 'https://tabiturient.ru/vuzu/mstuca',
+        'мгимо': 'https://tabiturient.ru/vuzu/mgimo',
+        'дубна': 'https://tabiturient.ru/vuzu/dubna',
+        'ргутис': 'https://tabiturient.ru/vuzu/rguts',
+        'мгри': 'https://tabiturient.ru/vuzu/mgri',
+        'рта': 'https://tabiturient.ru/vuzu/rta',
+        'мгуту': 'https://tabiturient.ru/vuzu/mgutu',
+        'гуз': 'https://tabiturient.ru/vuzu/guz',
+        'вавт': 'https://tabiturient.ru/vuzu/vavt',
+        'гаугн': 'https://tabiturient.ru/vuzu/gaugn',
+        'вгую': 'https://tabiturient.ru/vuzu/rpa/',
+        'иря': 'https://tabiturient.ru/vuzu/pushkin',
+        'мгавт': 'https://tabiturient.ru/vuzu/msawt',
+        'ргуп': 'https://tabiturient.ru/vuzu/raj',
+        'мид': 'https://tabiturient.ru/vuzu/dipacademy',
+        'ргаис': 'https://tabiturient.ru/vuzu/rgiis',
+        'мгу': 'https://tabiturient.ru/vuzu/mgu',
+        'рэш': 'https://tabiturient.ru/vuzu/nes',
+        'мархи': 'https://tabiturient.ru/vuzu/marhi',
+        'вгик': 'https://tabiturient.ru/vuzu/vgik',
+        'гитис': 'https://tabiturient.ru/vuzu/gitis',
+        'асоу': 'https://tabiturient.ru/vuzu/asou',
+        'мгуу': 'https://tabiturient.ru/vuzu/mguu',
+        'ли': 'https://tabiturient.ru/vuzu/litinstitut',
+        'уп': 'https://tabiturient.ru/vuzu/agprf'}
+link = ''
 stopwords = {'этой', 'ей', 'бы', 'же', 'через', 'его', 'том', 'никогда', 'хорошо', 'мой', 'ничего', 'ним', 'во',
              'совсем', 'то', 'над', 'тоже', 'этом', 'им', 'мне', 'ж', 'чтобы', 'ее', 'только', 'тут', 'была', 'один',
              'моя', 'еще', 'почти', 'всю', 'надо', 'много', 'между', 'уж', 'лучше', 'свою', 'потому', 'были', 'был',
@@ -22,9 +84,11 @@ stopwords = {'этой', 'ей', 'бы', 'же', 'через', 'его', 'том
              'из', 'ли', 'эту', 'вот', 'а', 'без', 'иногда', 'более', 'всегда', 'всех', 'от', 'нет', 'этот', 'что',
              'со',
              'так', 'нибудь', 'того', 'опять', 'есть', 'чуть', 'этого', 'перед', 'да', 'о', 'потом'}
+theme_list = ['Питание', 'Общежитие', 'Преподаватели', 'Домашняя работа', 'Дополнительные занятия']
+themes = 'питаниеобщежитиедомашняяработапреподавателидополнительныезанятия'
 
 
-def get_html(url):  # возвращает данные сайты в виде тектса
+def get_html(url):
     r = requests.get(url)
     r.encoding = 'utf8'
     return r.text
@@ -35,80 +99,79 @@ def get_head(html):
     return soup
 
 
-link_mephi = 'https://tabiturient.ru/vuzu/mifi/'
-link_mgu = 'https://tabiturient.ru/vuzu/mgu/'
+def theme(list):
+    for e in list:
+        sentence = e.split('.')
+
+        for j in ['еда', 'кормят', 'еды', 'еду']:
+            if j in sentence:
+                print(sentence)
+
+
 bot = telebot.TeleBot('1449367202:AAEwKojyXQ_hgkPwUKLSWgnqdkuNtJj4zRE')
-
-
-@bot.message_handler(content_types=['text'])
-def get_text_messages(message):  # постоянно принимает сообщения
-    if message.text == "/start":
-        bot.send_message(message.from_user.id, "Привет, о каком ВУЗе вы хотите получить отзыв?")
-        bot.send_message(message.from_user.id, text='Выбор ВУЗа', reply_markup=keyboard)
-    else:
-        bot.send_message(message.from_user.id, "Я тебя не понимаю. Напиши /start.")
-
-
-keyboard = types.InlineKeyboardMarkup()  # создание клавиатуры
-key_mephi = types.InlineKeyboardButton(text='МИФИ', callback_data='MEPHI')
-key_mgu = types.InlineKeyboardButton(text='МГУ', callback_data='MGU')
-keyboard.add(key_mephi)  # Добавление кнопки в клавиатуру
-keyboard.add(key_mgu)
-
 keyboard3 = types.InlineKeyboardMarkup()
 key_theme = types.InlineKeyboardButton(text='Выбор темы', callback_data='themebtn')
 key_eneral = types.InlineKeyboardButton(text='Общий', callback_data='generalbtn')
 keyboard3.add(key_theme)
 keyboard3.add(key_eneral)
 
-keyboard4 = types.InlineKeyboardMarkup()
-key_ob = types.InlineKeyboardButton(text='Общежитие', callback_data='obsh')
-key_food = types.InlineKeyboardButton(text='Еда', callback_data='food')
-key_teachers = types.InlineKeyboardButton(text='Преподователи', callback_data='teachers')
-key_homework = types.InlineKeyboardButton(text='Домашняя работа', callback_data='homework')
-key_extra = types.InlineKeyboardButton(text='Дополнительные занятия', callback_data='extra')
-keyboard4.add(key_ob)
-keyboard4.add(key_food)
-keyboard4.add(key_homework)
-keyboard4.add(key_teachers)
-keyboard4.add(key_extra)
+keyboard = types.InlineKeyboardMarkup()
+key_1 = types.InlineKeyboardButton(text='Общая информация', callback_data='about')
+key_2 = types.InlineKeyboardButton(text='Проходные баллы и направления подготовки', callback_data='prohodnoi')
+key_3 = types.InlineKeyboardButton(text='Отзывы', callback_data='otziv')
+key_4 = types.InlineKeyboardButton(text='Общежитие', callback_data='obsh')
+key_5 = types.InlineKeyboardButton(text='Дни открытых дверей', callback_data='dod')
+keyboard.add(key_1)
+keyboard.add(key_2)
+keyboard.add(key_3)
+keyboard.add(key_4)
+keyboard.add(key_5)
+
+keyboard2 = types.InlineKeyboardMarkup()
+for i in range(5):
+    key = types.InlineKeyboardButton(text=f'{theme_list[i]}', callback_data=f'')
+
+def check(name):
+    for e in dict:
+        if name in e:
+            return True
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):  # отвечает за кнопки и ответы на сообщения
-    global heads
-    if call.data == "MEPHI":  # инициализация нажатой кнопки
-        link = link_mephi  # ссылка на ВУЗ
-        site_name = get_html(link)
-        site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='font2')  # поиск всех блоков с нужными параметрами
-        heads = []
-        for e in head:
-            heads.append(e.text)  # обработка до приличного состояния
-        heads = [e for e in heads if e is not None]
-        msg = 'Вы хотите получить общий отзыв ВУЗе или по теме?'
-        bot.send_message(call.message.chat.id, msg,
-                         reply_markup=keyboard3)  # отсылает сообщение, показывает клавиатуру с выбором
+n_ot = 0
+heads = []
 
-    if call.data == 'MGU':
-        link = link_mgu
+
+@bot.message_handler(content_types=['text'])
+def get_text_messages(message):
+    global link, heads
+    if message.text == "/start":
+        bot.send_message(message.from_user.id, "О каком ВУЗе Вы хотите получить отзыв? (Напишите в чат)")
+    elif check(message.text.lower()):
+        link = dict[message.text.lower()]
         site_name = get_html(link)
         site_data = get_head(site_name)
         head = site_data.find_all('div', class_='font2')
-        heads = []
         for e in head:
             heads.append(e.text)
         heads = [e for e in heads if e is not None]
-        msg = 'Вы хотите получить общий отзыв ВУЗе или по теме?'
-        bot.send_message(call.message.chat.id, msg, reply_markup=keyboard3)
+        theme(heads)
+        bot.send_message(message.from_user.id, text='Какую информацию вы хотите получить?',
+                         reply_markup=keyboard)
+    elif message.text.lower() in themes:
+        bot.send_message(message.from_user.id, text='Coming soon...')
+    else:
+        bot.send_message(message.from_user.id, "Я Вас не понимаю.")
 
-    if call.data == 'themebtn':
-        msg = 'Выберите тему'
-        bot.send_message(call.message.chat.id, msg, reply_markup=keyboard4)
 
-    if call.data == 'generalbtn':  # так как это обычный отзыв, на данном этапе он просто
-        # берет некое количество отзывов и делает их краткое содержание.
-        # Вскоре эта схема генерации будет заменена на обговоренную
+about = []
+about2 = []
+dod = []
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_worker(call):
+    global link, about, about2, dod
+    if call.data == 'generalbtn':
         text = ''
         print(len(heads))
         for i in range(10):  # задаем количество отзывов.
@@ -139,9 +202,82 @@ def callback_worker(call):  # отвечает за кнопки и ответы
             word2count[key] = word2count[key] / max(word2count.values())
 
         sentences = heapq.nlargest(7, sent2score, key=sent2score.get)  # вытаскивает семь предложений.
-        # Число можно и нужно будет  поменять
         t = ' '.join(sentences)
-        bot.send_message(call.message.chat.id, t)  # вывод
+        bot.send_message(call.message.chat.id, t)
+
+    if call.data == 'about':
+        link += '/about'
+        site_name = get_html(link)
+        site_data = get_head(site_name)
+        about = []
+        head = site_data.find_all('ul', class_='font2')
+        for e in head:
+            about.append(e.text)
+        about = [e for e in about if e is not None]
+        about_text = 'Структура ВУЗа:\n' + ''.join(about[0:-1])
+        bot.send_message(call.message.chat.id, about_text)
+
+        head = site_data.find_all('b', attrs={'style': 'text-transform:uppercase; color:#8D8D8D;'})
+        for e in head:
+            about2.append(e.text)
+        about2 = [e for e in about2 if e is not None]
+
+    if call.data == 'otziv':
+        bot.send_message(call.message.chat.id, 'Вы хотите получить общий отзыв или по конкретной теме?',
+                         reply_markup=keyboard3)
+
+    if call.data == 'themebtn':
+        bot.send_message(call.message.chat.id, 'Выберите тему: \n\n' + ''.join(theme_list))
+
+    if call.data == 'dod':
+        link += '/dod'
+        site_name = get_html(link)
+        site_data = get_head(site_name)
+        head = site_data.find_all('div', class_='more error')
+        for e in head:
+            dod.append(e.text)
+        dod = [e for e in dod if e is not None]
+        if len(dod) == 0:
+            head = site_data.find_all('table', class_='dodlist')
+            for e in head:
+                dod.append(e.text)
+            dod = [e for e in dod if e is not None]
+            dod2 = []
+            print(dod)
+            for e in dod:
+                i = e.replace('\n\n\n\n\n\n\n\n\n\nПодробнее\n\n\n\n\n', '')
+                i = i.replace('\n\n\n\n\n\n\n', '\n')
+                i = i.replace('\n\n\n\n\n\n', '\n')
+                i = i.replace('\n\n\n\n\n', '\n')
+
+                dod2.append(i)
+            bot.send_message(call.message.chat.id, ''.join(dod2[:-5]))
+        else:
+            bot.send_message(call.message.chat.id,
+                             'К сожалению, нет грядущих дней открытых дверей в этом вузе (или мы о них не знаем)')
+
+    if call.data == 'obsh':
+        link += '/obsh'
+        obsh = []
+        site_name = get_html(link)
+        site_data = get_head(site_name)
+        head = site_data.find_all('div', class_='p40 pm40')
+        for e in head:
+            obsh.append(e.text)
+        obsh = [e for e in obsh if e is not None]
+        bot.send_message(call.message.chat.id, obsh[0].replace('\n\n\n\n\n\n', '\n').replace('\n\n\n\n', '\n'))
+
+        if call.data == 'prohodnoi':
+            link += '/prohodnoi'
+            ball = []
+            site_name = get_html(link)
+            site_data = get_head(site_name)
+            head = site_data.find_all('div', id_="rezspec")
+            for e in head:
+                ball.append(e.text)
+            ball = [e for e in ball if e is not None]
+            print(ball)
+
 
 
 bot.polling(none_stop=True, interval=0)
