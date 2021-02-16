@@ -117,7 +117,7 @@ keyboard3.add(key_eneral)
 
 keyboard = types.InlineKeyboardMarkup()
 key_1 = types.InlineKeyboardButton(text='Общая информация', callback_data='about')
-key_2 = types.InlineKeyboardButton(text='Проходные баллы и направления подготовки', callback_data='prohodnoi')
+key_2 = types.InlineKeyboardButton(text='Направления подготовки', callback_data='prohodnoi')
 key_3 = types.InlineKeyboardButton(text='Отзывы', callback_data='otziv')
 key_4 = types.InlineKeyboardButton(text='Общежитие', callback_data='obsh')
 key_5 = types.InlineKeyboardButton(text='Дни открытых дверей', callback_data='dod')
@@ -208,8 +208,9 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, t)
 
     if call.data == 'about':
-        link += '/about'
-        site_name = get_html(link)
+        link2 = link
+        link2 += '/about'
+        site_name = get_html(link2)
         site_data = get_head(site_name)
         head = site_data.find_all('ul', class_='font2')
         for e in head:
@@ -225,8 +226,9 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, text='Выберите тему', reply_markup=keyboard2)
 
     if call.data == 'dod':
-        link += '/dod'
-        site_name = get_html(link)
+        link2 = link
+        link2 += '/dod'
+        site_name = get_html(link2)
         site_data = get_head(site_name)
         head = site_data.find_all('div', class_='more error')
         for e in head:
@@ -251,9 +253,10 @@ def callback_worker(call):
                              'К сожалению, нет грядущих дней открытых дверей в этом вузе (или мы о них не знаем)')
 
     if call.data == 'obsh':
-        link += '/obsh'
+        link2 = link
+        link2 += '/obsh'
         obsh = []
-        site_name = get_html(link)
+        site_name = get_html(link2)
         site_data = get_head(site_name)
         head = site_data.find_all('div', class_='p40 pm40')
         for e in head:
@@ -262,15 +265,17 @@ def callback_worker(call):
         bot.send_message(call.message.chat.id, obsh[0].replace('\n\n\n\n\n\n', '\n').replace('\n\n\n\n', '\n'))
 
     if call.data == 'prohodnoi':
-        link += '/prohodnoi'
+        link2 = link
+        link2 += '/prohodnoi'
+        link3 = link + '/about'
         ball = []
-        site_name = get_html(link)
+        site_name = get_html(link3)
         site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='mobpadd20-3')
+        head = site_data.find_all('div', class_='p40 pm40')
         for e in head:
             ball.append(e.text)
         ball = [e for e in ball if e is not None]
-        bot.send_message(call.message.chat.id, ''.join(ball))
+        bot.send_message(call.message.chat.id, (ball[0].split('Структура вуза')[0]).replace('\n\n\n', '\n'))
 
 
 bot.polling(none_stop=True, interval=0)
