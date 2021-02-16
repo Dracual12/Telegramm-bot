@@ -129,7 +129,9 @@ keyboard.add(key_5)
 
 keyboard2 = types.InlineKeyboardMarkup()
 for i in range(5):
-    key = types.InlineKeyboardButton(text=f'{theme_list[i]}', callback_data=f'')
+    key = types.InlineKeyboardButton(text=f'{theme_list[i]}', callback_data=f'{theme_list[i]}')
+    keyboard2.add(key)
+
 
 def check(name):
     for e in dict:
@@ -209,18 +211,18 @@ def callback_worker(call):
         link += '/about'
         site_name = get_html(link)
         site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='p40 pm40')
+        head = site_data.find_all('ul', class_='font2')
         for e in head:
             about2.append(e.text)
         about2 = [e for e in about2 if e is not None]
-        bot.send_message(call.message.chat.id, about2[0].replace('\n\n\n\n\n', '\n'))
+        bot.send_message(call.message.chat.id, 'Структура ВУЗа:' + about2[0])
 
     if call.data == 'otziv':
         bot.send_message(call.message.chat.id, 'Вы хотите получить общий отзыв или по конкретной теме?',
                          reply_markup=keyboard3)
 
     if call.data == 'themebtn':
-        bot.send_message(call.message.chat.id, 'Выберите тему: \n\n' + ''.join(theme_list))
+        bot.send_message(call.message.chat.id, text='Выберите тему', reply_markup=keyboard2)
 
     if call.data == 'dod':
         link += '/dod'
@@ -269,7 +271,6 @@ def callback_worker(call):
             ball.append(e.text)
         ball = [e for e in ball if e is not None]
         bot.send_message(call.message.chat.id, ''.join(ball))
-
 
 
 bot.polling(none_stop=True, interval=0)
