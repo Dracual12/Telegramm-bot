@@ -1,0 +1,60 @@
+from selenium import webdriver
+driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+
+
+def find_Vuz(name):
+    driver.get('https://tabiturient.ru/')
+    search = driver.find_element_by_class_name('search')
+    search.send_keys(name)
+    driver.execute_script("javascript:showvuz1('https://tabiturient.ru','','');")
+
+
+def click_menu(name):
+    find_Vuz(name)
+    ids = driver.find_elements_by_xpath('//*[@onclick]')
+    ids2 = []
+    for e in ids:
+        if 'openf' in e.get_attribute('onclick'):
+            ids2.append(e.get_attribute('onclick'))
+    driver.execute_script(f"javascript:{ids2[2]}")
+
+
+def click_row(name):
+    click_menu(name)
+    ids = driver.find_elements_by_xpath('//*[@href]')
+    ids2 = []
+    for e in ids:
+        if 'https://tabiturient.ru/vuzu' in e.get_attribute('href'):
+            ids2.append(e.get_attribute('href'))
+    print(ids2)
+    driver.close()
+    return ids2
+
+
+links_2 = click_row('мифи')
+
+
+def about():
+    driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+    driver.get(links_2[0])
+
+
+def prohodnoi():
+    driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+    driver.get(links_2[1])
+
+
+def otziv():
+    driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+    driver.get(links_2[2])
+
+
+def obsh():
+    driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+    driver.get(links_2[3])
+
+
+def dod():
+    driver = webdriver.Chrome(r"C:/Users/79859/Downloads/chromedriver_win32/chromedriver.exe")
+    driver.get(links_2[4])
+
