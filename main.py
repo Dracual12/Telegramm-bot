@@ -1,281 +1,61 @@
-import telebot
-from telebot import types
-import re
-import heapq
-from bs4 import BeautifulSoup
-from random import choice
-import requests
-
-dict = {'мирэа': 'https://tabiturient.ru/vuzu/mirea',
-        'мгту': 'https://tabiturient.ru/vuzu/mgtu',
-        'ниу вшэ': 'https://tabiturient.ru/vuzu/hse',
-        'маи': 'https://tabiturient.ru/vuzu/mai/',
-        'фу': 'https://tabiturient.ru/vuzu/fu',
-        'мгму': 'https://tabiturient.ru/vuzu/mgmu',
-        'рут': 'https://tabiturient.ru/vuzu/miit',
-        'рниму': 'https://tabiturient.ru/vuzu/rnimu',
-        'московский политех': 'https://tabiturient.ru/vuzu/mospolytech',
-        'ргау мсха': 'https://tabiturient.ru/vuzu/timacad',
-        'мпгу': 'https://tabiturient.ru/vuzu/mpgu',
-        'мэи': 'https://tabiturient.ru/vuzu/mpei',
-        'мгпу': 'https://tabiturient.ru/vuzu/mgpu',
-        'ргунг': 'https://tabiturient.ru/vuzu/gubkin',
-        'рхту': 'https://tabiturient.ru/vuzu/muctr',
-        'ниу мгсу': 'https://tabiturient.ru/vuzu/mgsu',
-        'ргу': 'https://tabiturient.ru/vuzu/kosygin',
-        'мгюа': 'https://tabiturient.ru/vuzu/mgua',
-        'мфти': 'https://tabiturient.ru/vuzu/mipt',
-        'мифи': 'https://tabiturient.ru/vuzu/mifi',
-        'мглу': 'https://tabiturient.ru/vuzu/mglu',
-        'мгоу': 'https://tabiturient.ru/vuzu/mgou',
-        'мтуси': 'https://tabiturient.ru/vuzu/mtusi',
-        'рудн': 'https://tabiturient.ru/vuzu/rudn',
-        'рггу': 'https://tabiturient.ru/vuzu/rsuh',
-        'ранхигс': 'https://tabiturient.ru/vuzu/ranepa',
-        'ниту мисис': 'https://tabiturient.ru/vuzu/misis',
-        'миэт': 'https://tabiturient.ru/vuzu/miet',
-        'мгупп': 'https://tabiturient.ru/vuzu/mgupp',
-        'ргуфусмит': 'https://tabiturient.ru/vuzu/rgufksmit',
-        'рэу': 'https://tabiturient.ru/vuzu/reu',
-        'мгту станкин': 'https://tabiturient.ru/vuzu/stankin',
-        'мгмсу': 'https://tabiturient.ru/vuzu/mgmsu',
-        'ргсу': 'https://tabiturient.ru/vuzu/rgsu/',
-        'мгппу': 'https://tabiturient.ru/vuzu/mgppu',
-        'гуу': 'https://tabiturient.ru/vuzu/guu',
-        'мади': 'https://tabiturient.ru/vuzu/madi',
-        'миигаик': 'https://tabiturient.ru/vuzu/miigaik',
-        'мгту га': 'https://tabiturient.ru/vuzu/mstuca',
-        'мгимо': 'https://tabiturient.ru/vuzu/mgimo',
-        'дубна': 'https://tabiturient.ru/vuzu/dubna',
-        'ргутис': 'https://tabiturient.ru/vuzu/rguts',
-        'мгри': 'https://tabiturient.ru/vuzu/mgri',
-        'рта': 'https://tabiturient.ru/vuzu/rta',
-        'мгуту': 'https://tabiturient.ru/vuzu/mgutu',
-        'гуз': 'https://tabiturient.ru/vuzu/guz',
-        'вавт': 'https://tabiturient.ru/vuzu/vavt',
-        'гаугн': 'https://tabiturient.ru/vuzu/gaugn',
-        'вгую': 'https://tabiturient.ru/vuzu/rpa/',
-        'иря': 'https://tabiturient.ru/vuzu/pushkin',
-        'мгавт': 'https://tabiturient.ru/vuzu/msawt',
-        'ргуп': 'https://tabiturient.ru/vuzu/raj',
-        'мид': 'https://tabiturient.ru/vuzu/dipacademy',
-        'ргаис': 'https://tabiturient.ru/vuzu/rgiis',
-        'мгу': 'https://tabiturient.ru/vuzu/mgu',
-        'рэш': 'https://tabiturient.ru/vuzu/nes',
-        'мархи': 'https://tabiturient.ru/vuzu/marhi',
-        'вгик': 'https://tabiturient.ru/vuzu/vgik',
-        'гитис': 'https://tabiturient.ru/vuzu/gitis',
-        'асоу': 'https://tabiturient.ru/vuzu/asou',
-        'мгуу': 'https://tabiturient.ru/vuzu/mguu',
-        'ли': 'https://tabiturient.ru/vuzu/litinstitut',
-        'уп': 'https://tabiturient.ru/vuzu/agprf'}
-link = ''
-stopwords = {'этой', 'ей', 'бы', 'же', 'через', 'его', 'том', 'никогда', 'хорошо', 'мой', 'ничего', 'ним', 'во',
-             'совсем', 'то', 'над', 'тоже', 'этом', 'им', 'мне', 'ж', 'чтобы', 'ее', 'только', 'тут', 'была', 'один',
-             'моя', 'еще', 'почти', 'всю', 'надо', 'много', 'между', 'уж', 'лучше', 'свою', 'потому', 'были', 'был',
-             'меня', 'них', 'мы', 'другой', 'ну', 'не', 'тогда', 'конечно', 'кто', 'он', 'я', 'там', 'наконец',
-             'больше',
-             'ведь', 'эти', 'ней', 'при', 'на', 'три', 'ты', 'нее', 'было', 'себя', 'за', 'про', 'с', 'всего', 'куда',
-             'какой', 'даже', 'после', 'в', 'него', 'вам', 'когда', 'или', 'будто', 'впрочем', 'нас', 'уже', 'можно',
-             'они', 'такой', 'до', 'все', 'чтоб', 'но', 'вдруг', 'ни', 'их', 'по', 'чего', 'будет', 'разве', 'она',
-             'вы',
-             'теперь', 'может', 'к', 'тебя', 'раз', 'чем', 'себе', 'какая', 'для', 'зачем', 'хоть', 'тем', 'и', 'быть',
-             'под', 'два', 'тот', 'нельзя', 'сам', 'у', 'здесь', 'ему', 'где', 'об', 'если', 'вас', 'как', 'сейчас',
-             'из', 'ли', 'эту', 'вот', 'а', 'без', 'иногда', 'более', 'всегда', 'всех', 'от', 'нет', 'этот', 'что',
-             'со',
-             'так', 'нибудь', 'того', 'опять', 'есть', 'чуть', 'этого', 'перед', 'да', 'о', 'потом'}
-theme_list = ['Питание', 'Общежитие', 'Преподаватели', 'Домашняя работа', 'Дополнительные занятия']
-themes = 'питаниеобщежитиедомашняяработапреподавателидополнительныезанятия'
+from telegram.ext import Updater, MessageHandler, Filters
+from telegram.ext import CallbackContext, CommandHandler
 
 
-def get_html(url):
-    r = requests.get(url)
-    r.encoding = 'utf8'
-    return r.text
+def start(update, context):
+    update.message.reply_text(
+        "Привет! Я эхо-бот. Напишите мне что-нибудь, и я пришлю это назад!")
 
 
-def get_head(html):
-    soup = BeautifulSoup(html, 'lxml')
-    return soup
+
+def task(context):
+    job = context.job
+    context.bot.send_message(job.context, text='Вернулся!')
 
 
-def theme(list):
-    for e in list:
-        sentence = e.split('.')
+def set_timer(update, context):
+    chat_id = update.message.chat_id
+    try:
+        due = int(context.args[0])
+        if due < 0:
+            update.message.reply_text(
+                'Извините, не умеем возвращаться в прошлое')
+            return
+        if 'job' in context.chat_data:
+            old_job = context.chat_data['job']
+            old_job.schedule_removal()
+        new_job = context.job_queue.run_once(task, due, context=chat_id)
+        context.chat_data['job'] = new_job
+        update.message.reply_text(f'Вернусь через {due} секунд')
 
-        for j in ['еда', 'кормят', 'еды', 'еду']:
-            if j in sentence:
-                print(sentence)
-
-
-bot = telebot.TeleBot('1449367202:AAEwKojyXQ_hgkPwUKLSWgnqdkuNtJj4zRE')
-keyboard3 = types.InlineKeyboardMarkup()
-key_theme = types.InlineKeyboardButton(text='Выбор темы', callback_data='themebtn')
-key_eneral = types.InlineKeyboardButton(text='Общий', callback_data='generalbtn')
-keyboard3.add(key_theme)
-keyboard3.add(key_eneral)
-
-keyboard = types.InlineKeyboardMarkup()
-key_1 = types.InlineKeyboardButton(text='Общая информация', callback_data='about')
-key_2 = types.InlineKeyboardButton(text='Направления подготовки', callback_data='prohodnoi')
-key_3 = types.InlineKeyboardButton(text='Отзывы', callback_data='otziv')
-key_4 = types.InlineKeyboardButton(text='Общежитие', callback_data='obsh')
-key_5 = types.InlineKeyboardButton(text='Дни открытых дверей', callback_data='dod')
-keyboard.add(key_1)
-keyboard.add(key_2)
-keyboard.add(key_3)
-keyboard.add(key_4)
-keyboard.add(key_5)
-
-keyboard2 = types.InlineKeyboardMarkup()
-for i in range(5):
-    key = types.InlineKeyboardButton(text=f'{theme_list[i]}', callback_data=f'{theme_list[i]}')
-    keyboard2.add(key)
+    except (IndexError, ValueError):
+        update.message.reply_text('Использование: /set <секунд>')
 
 
-def check(name):
-    for e in dict:
-        if name in e:
-            return True
+def unset_timer(update, context):
+    if 'job' not in context.chat_data:
+        update.message.reply_text('Нет активного таймера')
+        return
+    job = context.chat_data['job']
+    job.schedule_removal()
+    del context.chat_data['job']
+    update.message.reply_text('Хорошо, вернулся сейчас!')
 
 
-n_ot = 0
-heads = []
+def main():
+    updater = Updater('1667861363:AAFREVk3MhSDu-Og5gY7orCh9QcP45Pbdm0', use_context=True)
+    dp = updater.dispatcher
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("set_timer", set_timer,
+                                  pass_args=True,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
+    dp.add_handler(CommandHandler("unset", unset_timer,
+                                  pass_chat_data=True)
+                   )
+    updater.start_polling()
+    updater.idle()
 
 
-@bot.message_handler(content_types=['text'])
-def get_text_messages(message):
-    global link, heads
-    if message.text == "/start":
-        bot.send_message(message.from_user.id, "О каком ВУЗе Вы хотите получить отзыв? (Напишите в чат)")
-    elif check(message.text.lower()):
-        link = dict[message.text.lower()]
-        site_name = get_html(link)
-        site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='font2')
-        for e in head:
-            heads.append(e.text)
-        heads = [e for e in heads if e is not None]
-        theme(heads)
-        bot.send_message(message.from_user.id, text='Какую информацию вы хотите получить?',
-                         reply_markup=keyboard)
-    elif message.text.lower() in themes:
-        bot.send_message(message.from_user.id, text='Coming soon...')
-    else:
-        bot.send_message(message.from_user.id, "Я Вас не понимаю.")
-
-
-about = []
-about2 = []
-dod = []
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call):
-    global link, about, about2, dod
-    if call.data == 'generalbtn':
-        text = ''
-        print(len(heads))
-        for i in range(10):  # задаем количество отзывов.
-            text += choice(heads)  # На данный момент методом рандома
-
-        sentences = re.split(r' *[\.\?!][\'"\)\]]* *', text)
-        clean_text = text.lower()
-        word_tokenize = clean_text.split()
-
-        word2count = {}
-        for word in word_tokenize:
-            if word not in stopwords:
-                if word not in word2count.keys():
-                    word2count[word] = 1
-                else:
-                    word2count[word] += 1
-        sent2score = {}
-        for sentence in sentences:
-            for word in sentence.split():
-                if word in word2count.keys():
-                    if 28 > len(sentence.split(' ')) > 9:
-                        if sentence not in sent2score.keys():
-                            sent2score[sentence] = word2count[word]
-                        else:
-                            sent2score[sentence] += word2count[word]
-
-        for key in word2count.keys():
-            word2count[key] = word2count[key] / max(word2count.values())
-
-        sentences = heapq.nlargest(7, sent2score, key=sent2score.get)  # вытаскивает семь предложений.
-        t = ' '.join(sentences)
-        bot.send_message(call.message.chat.id, t)
-
-    if call.data == 'about':
-        link2 = link
-        link2 += '/about'
-        site_name = get_html(link2)
-        site_data = get_head(site_name)
-        head = site_data.find_all('ul', class_='font2')
-        for e in head:
-            about2.append(e.text)
-        about2 = [e for e in about2 if e is not None]
-        bot.send_message(call.message.chat.id, 'Структура ВУЗа:' + about2[0])
-
-    if call.data == 'otziv':
-        bot.send_message(call.message.chat.id, 'Вы хотите получить общий отзыв или по конкретной теме?',
-                         reply_markup=keyboard3)
-
-    if call.data == 'themebtn':
-        bot.send_message(call.message.chat.id, text='Выберите тему', reply_markup=keyboard2)
-
-    if call.data == 'dod':
-        link2 = link
-        link2 += '/dod'
-        site_name = get_html(link2)
-        site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='more error')
-        for e in head:
-            dod.append(e.text)
-        dod = [e for e in dod if e is not None]
-        if len(dod) == 0:
-            head = site_data.find_all('table', class_='dodlist')
-            for e in head:
-                dod.append(e.text)
-            dod = [e for e in dod if e is not None]
-            dod2 = []
-            for e in dod:
-                i = e.replace('\n\n\n\n\n\n\n\n\n\nПодробнее\n\n\n\n\n', '')
-                i = i.replace('\n\n\n\n\n\n\n', '\n')
-                i = i.replace('\n\n\n\n\n\n', '\n')
-                i = i.replace('\n\n\n\n\n', '\n')
-
-                dod2.append(i)
-            bot.send_message(call.message.chat.id, ''.join(dod2[:-5]))
-        else:
-            bot.send_message(call.message.chat.id,
-                             'К сожалению, нет грядущих дней открытых дверей в этом вузе (или мы о них не знаем)')
-
-    if call.data == 'obsh':
-        link2 = link
-        link2 += '/obsh'
-        obsh = []
-        site_name = get_html(link2)
-        site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='p40 pm40')
-        for e in head:
-            obsh.append(e.text)
-        obsh = [e for e in obsh if e is not None]
-        bot.send_message(call.message.chat.id, obsh[0].replace('\n\n\n\n\n\n', '\n').replace('\n\n\n\n', '\n'))
-
-    if call.data == 'prohodnoi':
-        link2 = link
-        link2 += '/prohodnoi'
-        link3 = link + '/about'
-        ball = []
-        site_name = get_html(link3)
-        site_data = get_head(site_name)
-        head = site_data.find_all('div', class_='p40 pm40')
-        for e in head:
-            ball.append(e.text)
-        ball = [e for e in ball if e is not None]
-        bot.send_message(call.message.chat.id, (ball[0].split('Структура вуза')[0]).replace('\n\n\n', '\n'))
-
-
-bot.polling(none_stop=True, interval=0)
+if __name__ == '__main__':
+    main()
