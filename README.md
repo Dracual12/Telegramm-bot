@@ -1,2 +1,3 @@
 # Telegramm-bot
-# Код находится в файле "bot-main"
+# Код находится в файле "bot-main
+django
